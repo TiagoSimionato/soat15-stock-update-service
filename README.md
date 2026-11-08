@@ -1,0 +1,1 @@
+# soat15-stock-update-service
