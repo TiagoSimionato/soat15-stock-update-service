@@ -26,6 +26,9 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payload = this.jwtService.verify(token);
+      if (!payload.roles.includes('ADMIN')) {
+        throw new UnauthorizedException();
+      }
       request.user = payload;
     }
     catch {
