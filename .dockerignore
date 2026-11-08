@@ -1,0 +1,9 @@
+dist
+coverage
+.scannerwork
+.github
+.gitignore
+/*.md
+k8s
+docker-compose.yml
+infra
