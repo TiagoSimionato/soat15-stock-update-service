@@ -69,7 +69,6 @@ jobs:
           TF_VAR_postgres_user:               ${{ secrets.DB_USER }}
           TF_VAR_postgres_password:           ${{ secrets.DB_PASSWORD }}
           TF_VAR_postgres_db:                 ${{ vars.DB_NAME }}
-          TF_VAR_jwt_secret:                  ${{ secrets.JWT_SECRET }}
           TF_VAR_ghcr_username:               ${{ secrets.GHCR_USER }}
           TF_VAR_ghcr_token:                  ${{ secrets.GHCR_TOKEN }}
           TF_VAR_image:                       ${{ steps.setup_env.outputs.image }}
