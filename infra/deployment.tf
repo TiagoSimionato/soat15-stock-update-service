@@ -82,7 +82,7 @@ resource "kubernetes_deployment" "stock-app" {
             name  = "JWT_SECRET"
             value_from {
               secret_key_ref {
-                name = "app-secrets"
+                name = "secrets-15soat"
                 key  = "JWT_SECRET"
               }
             }
@@ -92,7 +92,7 @@ resource "kubernetes_deployment" "stock-app" {
             name  = "CLIENT_ID"
             value_from {
               secret_key_ref {
-                name = "app-secrets"
+                name = "secrets-15soat"
                 key  = "CLIENT_ID"
               }
             }
@@ -102,7 +102,7 @@ resource "kubernetes_deployment" "stock-app" {
             name  = "CLIENT_SECRET"
             value_from {
               secret_key_ref {
-                name = "app-secrets"
+                name = "secrets-15soat"
                 key  = "CLIENT_SECRET"
               }
             }
