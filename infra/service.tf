@@ -8,9 +8,9 @@ resource "kubernetes_service" "stock-app" {
     selector = { app = "15soat-stock-update-service" }
 
     port {
-      port        = 3001
-      target_port = 3001
-      node_port   = 30001
+      port        = 3002
+      target_port = 3002
+      node_port   = 30002
     }
 
     type = "NodePort"
