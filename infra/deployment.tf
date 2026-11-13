@@ -32,7 +32,7 @@ resource "kubernetes_deployment" "stock-app" {
           liveness_probe {
             http_get {
               path = "/health"
-              port = 3000
+              port = 3002
             }
             initial_delay_seconds = 10
           }
@@ -50,7 +50,7 @@ resource "kubernetes_deployment" "stock-app" {
           }
 
           port {
-            container_port = 3000
+            container_port = 3002
           }
 
           env {
