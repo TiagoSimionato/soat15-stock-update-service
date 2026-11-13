@@ -1,0 +1,79 @@
+name: Build and Deploy project
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+
+      - name: Build and push image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+
+      - name: Set up Env
+        id: setup_env
+        run: |
+          REPOSITORY=$(echo ${{ github.repository }} | sed -e 's/\(.*\)/\L\1/')
+          TAG=$(echo ${{ github.sha }} | cut -c 1-7)
+          APP_IMAGE=ghcr.io/${REPOSITORY}:sha-${TAG}
+          echo "image=${APP_IMAGE}" >> $GITHUB_OUTPUT
+
+      - name: Terraform Init and Apply
+        env:
+          TF_VAR_postgres_user:               ${{ secrets.DB_USER }}
+          TF_VAR_postgres_password:           ${{ secrets.DB_PASSWORD }}
+          TF_VAR_postgres_db:                 ${{ vars.DB_NAME }}
+          TF_VAR_ghcr_username:               ${{ secrets.GHCR_USER }}
+          TF_VAR_ghcr_token:                  ${{ secrets.GHCR_TOKEN }}
+          TF_VAR_image:                       ${{ steps.setup_env.outputs.image }}
+          TF_VAR_kind_endpoint:               ${{ secrets.KIND_ENDPOINT }}
+          TF_VAR_kind_client_certificate:     ${{ secrets.KIND_CLIENT_CERTIFICATE }}
+          TF_VAR_kind_client_key:             ${{ secrets.KIND_CLIENT_KEY }}
+          TF_VAR_kind_cluster_ca_certificate: ${{ secrets.KIND_CLUSTER_CA_CERTIFICATE }}
+        run: terraform -chdir=infra init && terraform -chdir=infra apply -auto-approve
