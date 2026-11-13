@@ -21,6 +21,6 @@ COPY --chown=node:node --from=builder /app/dist ./dist
 
 USER node
 
-EXPOSE 3000
+EXPOSE 3002
 
 CMD ["node", "dist/src/main.js"]
